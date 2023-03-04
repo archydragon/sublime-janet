@@ -212,3 +212,12 @@
 #                    ^ variable.other.janet
     arr)
 #   ^ variable.other.janet
+
+
+# INVALID PARENS
+(1 2 3)))
+#      ^^ invalid.illegal.stray-bracket-end.janet
+[1 2 3]]
+#      ^ invalid.illegal.stray-bracket-end.janet
+([)]
+# ^ invalid.illegal.stray-bracket-end.janet
