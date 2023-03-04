@@ -1,0 +1,252 @@
+%YAML 1.2
+---
+# http://www.sublimetext.com/docs/syntax.html
+# https://janet-lang.org/docs/index.html
+version: 2
+file_extensions: [janet]
+scope: source.janet
+
+variables:
+  ws: "[ \t\r\f\n\v]"
+  close: '(?=$|[\s,()\[\]{}";])'
+  readermac: "([';~,|]*)"
+  symchars: "[a-zA-Z0-9!$%&*+-./:<?=>@^_\"]"
+
+  # Constants for highlighting functions from standard library.
+  # fetched from src/core/compile.c and src/core/specials.c
+  boot_spec:  "break|def|do|fn|if|quasiquote|quote|set|splice|unquote|upscope|var|while|call|maker|array|tuple|tablector|bufferctor"
+  # fetched from the rest of C sources.
+  boot_c:     "asm|disasm|compile|dyn|setdyn|native|describe|string|symbol|keyword|buffer|abstract\\?|scan-number|tuple|array|slice|table|getproto|struct|gensym|gccollect|gcsetinterval|gcinterval|type|hash|getline|trace|untrace|int\\?|nat\\?|signal|memcmp|sandbox|print|prin|eprint|eprin|xprint|xprin|printf|prinf|eprintf|eprinf|xprintf|xprinf|flush|eflush|env-lookup|marshal|unmarshal|not|debug|error|apply|yield|resume|in|put|length|add|sub|mul|div|band|bor|bxor|lshift|rshift|rshiftu|bnot|gt|lt|gte|lte|eq|neq|propagate|get|next|modulo|remainder|cmp|cancel|mod"
+  # defined in src/boot/boot.janet via defn
+  boot_defn:  "defmacro|defglobal|varglobal|nan\\?|number\\?|fiber\\?|string\\?|symbol\\?|keyword\\?|buffer\\?|function\\?|cfunction\\?|table\\?|struct\\?|array\\?|tuple\\?|boolean\\?|bytes\\?|dictionary\\?|indexed\\?|truthy\\?|true\\?|false\\?|nil\\?|empty\\?|odd\\?|inc|dec|errorf|return|sum|mean|product|comp|identity|complement|extreme|max|min|max-of|min-of|first|last|compare|compare=|compare<|compare<=|compare>|compare>=|zero\\?|pos\\?|neg\\?|one\\?|even\\?|odd\\?|sort|sort-by|sorted|sorted-by|reduce|reduce2|accumulate|accumulate2|map|mapcat|filter|count|keep|range|find-index|find|index-of|take|take-until|take-while|drop|drop-until|drop-while|juxt\\*|walk|postwalk|prewalk|partial|every\\?|any\\?|reverse!|reverse|invert|zipcoll|get-in|update-in|put-in|update|merge-into|merge|keys|values|pairs|frequencies|group-by|partition-by|interleave|distinct|flatten-into|flatten|kvs|from-pairs|interpose|partition|slurp|spit|pp|maclintf|macex1|all|some|not=|deep-not=|deep=|freeze|macex|make-env|bad-parse|warn-compile|bad-compile|curenv|run-context|quit|eval|parse|parse-all|eval-string|make-image|load-image|debugger|debugger-on-status|dofile|require|merge-module|import\\*|all-bindings|all-dynamics|doc-format|doc\\*|doc-of|\\.fiber|\\.signal|\\.stack|\\.frame|\\.locals|\\.fn|\\.slots|\\.slot|\\.source|\\.break|\\.clear|\\.next|\\.nextc|\\.step|repl|flycheck|cli-main"
+  # defined in src/boot/boot.janet via defmacro
+  boot_macro: "as-macro|defmacro-|defn-|def-|var-|toggle|assert|default|comment|if-not|when|unless|cond|case|let|try|protect|and|or|with-syms|defer|edefer|prompt|chr|label|with|when-with|if-with|forv|for|eachk|eachp|repeat|forever|each|loop|seq|tabseq|generate|coro|fiber-fn|if-let|when-let|juxt|defdyn|tracev|with-dyns|with-vars|match|varfn|short-fn|comptime|compif|compwhen|import|use|doc|delay|->|->>|-?>|-?>>|as->|as?->|--|\\+=|\\+\\+|-=|\\*=|/=|%=|\\+|-|\\*|%|/|>=|<=|=|<|>"
+
+contexts:
+  # Only elements which may occur on top level.
+  main:
+    - meta_content_scope: meta.main
+    - include: comment
+    - include: top-defs
+    - include: defn
+    - include: boot
+    - include: parens-round
+    - include: parens-square
+    - include: parens-wat
+
+  # Expressions can be nested.
+  expressions:
+    - meta_content_scope: meta.expressions
+    - include: comment
+    - include: boot
+    - include: constants
+    - include: numbers
+    - include: strings
+    - include: symbols
+    - include: literals
+    - include: parens-round
+    - include: parens-square
+    - include: parens-wat
+
+  ##############################################################################
+  # Language basics.
+
+  comment:
+    - match: '(#+).*$'
+      scope: comment.line.janet
+
+  # Those are being collected separately, so they're put to go to symbol list (via entity.name.* scope).
+  # Known bug: in top level (def constref "text") "text" will be shown as a docstring, not as a normal string.
+  top-defs:
+    - match: '^\(((def|defglobal|defdyn)\-?){{ws}}+({{symchars}}+)'
+      captures:
+        1: keyword.janet
+        3: entity.name.constant.janet
+      push:
+      - meta_scope: meta.parens.janet
+      - match: \)
+        pop:   true
+      - include: symbols
+      - include: docstrings
+      - include: main
+
+  # Named functions and macros are also put to go to symbol list (via entity.name.* scope).
+  defn:
+    - match: '{{readermac}}\(((defn|defmacro)\-?){{ws}}+({{symchars}}+)'
+      captures:
+        1: punctuation.accessor.readermac.janet
+        2: keyword.janet
+        4: entity.name.function.janet
+      push:
+      - meta_scope: meta.parens.janet
+      - match: \)
+        pop:   true
+      - include: symbols
+      - include: docstrings
+      - include: main
+      - include: expressions
+
+  # "Keywords" from standard library.
+  boot:
+    - match: '{{readermac}}\({{readermac}}({{boot_spec}}|{{boot_c}}|{{boot_defn}}|{{boot_macro}})({{close}}+)'
+      captures:
+        1: punctuation.accessor.readermac.janet
+        2: punctuation.accessor.readermac.janet
+        3: keyword.janet
+      push:
+      - meta_scope: meta.parens.janet
+      - match: \)
+        pop:   true
+      - include: main
+      - include: expressions
+
+  constants:
+    - match: '(nil|true|false){{close}}+'
+      scope: constant.language.janet
+
+  ##############################################################################
+  # User literals (numbers, strings, docstrings)
+
+  numbers:
+    # dec
+    - match: '(\-|\+)?([0-9_]+(\.[0-9_]+)?((e|&)(\-|\+)?[0-9_]*)?)?(\.[0-9_]+)?{{close}}+'
+      scope: constant.numeric.janet
+    # hex
+    - match: '(\-|\+)?0x([0-9a-fA-F_]+(\.[0-9a-fA-F_]+)?((e|&)(\-|\+)?[0-9a-fA-F_]*)?)?(\.[0-9a-fA-F_]+)?{{close}}+'
+      scope: constant.numeric.janet
+    # custom base
+    - match: '(\-|\+)?[0-9]+r([0-9a-fA-F_]+(\.[0-9a-fA-F_]+)?((e|&)(\-|\+)?[0-9a-fA-F_]*)?)?(\.[0-9a-fA-F_]+)?{{close}}+'
+      scope: constant.numeric.janet
+
+  strings:
+    - match: '(@?)```'
+      capture:
+        1: punctuation.accessor.mutable.janet
+      scope: punctuation.definition.string.begin.janet
+      push:
+        - meta_scope: string.quoted.double.janet
+        - match: '```'
+          scope: punctuation.definition.string.end.janet
+          pop: true
+    - match: '(@?)``'
+      capture:
+        1: punctuation.accessor.mutable.janet
+      scope: punctuation.definition.string.begin.janet
+      push:
+        - meta_scope: string.quoted.double.janet
+        - match: '``'
+          scope: punctuation.definition.string.end.janet
+          pop: true
+    - match: '(@?)`'
+      capture:
+        1: punctuation.accessor.mutable.janet
+      scope: punctuation.definition.string.begin.janet
+      push:
+        - meta_scope: string.quoted.double.janet
+        - match: '`'
+          scope: punctuation.definition.string.end.janet
+          pop: true
+    - match: '(@?)"'
+      capture:
+        1: punctuation.accessor.mutable.janet
+      scope: punctuation.definition.string.begin.janet
+      push:
+        - meta_scope: string.quoted.double.janet
+        - match: '"'
+          scope: punctuation.definition.string.end.janet
+          pop: true
+        # We only have possibility to escape values in single lined strings.
+        - match: \\.
+          scope: constant.character.escape.janet
+
+  docstrings:
+    - match: '```'
+      scope: comment.block.documentation.begin.janet
+      push:
+        - meta_scope: comment.block.documentation.janet
+        - match: '```'
+          scope: comment.block.documentation.end.janet
+          pop: true
+    - match: '``'
+      scope: comment.block.documentation.begin.janet
+      push:
+        - meta_scope: comment.block.documentation.janet
+        - match: '``'
+          scope: comment.block.documentation.end.janet
+          pop: true
+    - match: '`'
+      scope: comment.block.documentation.begin.janet
+      push:
+        - meta_scope: comment.block.documentation.janet
+        - match: '`'
+          scope: comment.block.documentation.end.janet
+          pop: true
+    - match: '"'
+      scope: comment.block.documentation.begin.janet
+      push:
+        - meta_scope: comment.block.documentation.janet
+        - match: '"'
+          scope: comment.block.documentation.end.janet
+          pop: true
+        # We only have possibility to escape values in single lined strings.
+        - match: \\.
+          scope: constant.character.escape.janet
+
+  ##############################################################################
+  # Generic things.
+
+  symbols:
+    - match: ':{{symchars}}+'
+      scope: keyword.symbol.janet
+
+  literals:
+    - match: '{{readermac}}(({{symchars}}+)/)?{{symchars}}+'
+      captures:
+        1: punctuation.accessor.readermac.janet
+        3: storage.type.class.janet
+
+  ##############################################################################
+  # Parens for everything else.
+
+  parens-round:
+    - match: '{{readermac}}(@?)(\()'
+      captures:
+        1: punctuation.accessor.readermac.janet
+        2: punctuation.accessor.mutable.janet
+      push:
+        - meta_scope: meta.group.janet
+        - match: '\)'
+          pop:   true
+        - include: expressions
+    - match: '\)'
+      scope: invalid.illegal.stray-bracket-end.janet
+
+  parens-square:
+    - match: '{{readermac}}(@?)(\[)'
+      captures:
+        1: punctuation.accessor.readermac.janet
+        2: punctuation.accessor.mutable.janet
+        3: punctuation.definition.group.begin.janet
+      push:
+        - meta_scope: meta.group.janet
+        - match: '\]'
+          scope: punctuation.definition.group.end.janet
+          pop:   true
+        - include: expressions
+    - match: '\]'
+      scope: invalid.illegal.stray-bracket-end.janet
+
+  parens-wat:
+    - match: '{{readermac}}(@?)(\{)'
+      captures:
+        1: punctuation.accessor.readermac.janet
+        2: punctuation.accessor.mutable.janet
+        3: punctuation.definition.group.begin.janet
+      push:
+        - meta_scope: meta.group.janet
+        - match: '\}'
+          scope: punctuation.definition.group.end.janet
+          pop:   true
+        - include: expressions
+    - match: '\}'
+      scope: invalid.illegal.stray-bracket-end.janet
