@@ -55,7 +55,7 @@
     [condition & body]
 #   ^ punctuation.definition.group.begin.janet
 #    ^ variable.other.janet
-#              ^ variable.other.janet
+#              ^ punctuation.separator.optional.janet
 #                ^ variable.other.janet
 #                    ^ punctuation.definition.group.end.janet
     ~(if ,condition (do ,;body)))

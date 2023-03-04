@@ -206,6 +206,10 @@ contexts:
         3: storage.type.class.janet
         4: variable.other.janet
 
+  opt-delimiter:
+    - match: '&'
+      scope: punctuation.separator.optional.janet
+
   ##############################################################################
   # Parens for everything else.
 
@@ -233,6 +237,7 @@ contexts:
         - match: '\]'
           scope: punctuation.definition.group.end.janet
           pop:   true
+        - include: opt-delimiter
         - include: expressions
     - match: '\]'
       scope: invalid.illegal.stray-bracket-end.janet
