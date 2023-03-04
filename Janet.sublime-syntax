@@ -200,10 +200,11 @@ contexts:
       scope: keyword.symbol.janet
 
   literals:
-    - match: '{{readermac}}(({{symchars}}+)/)?{{symchars}}+'
+    - match: '{{readermac}}(({{symchars}}+)/)?({{symchars}}+)'
       captures:
         1: punctuation.accessor.readermac.janet
         3: storage.type.class.janet
+        4: variable.other.janet
 
   ##############################################################################
   # Parens for everything else.
