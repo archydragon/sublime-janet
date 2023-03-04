@@ -1,0 +1,31 @@
+[
+     {
+        "id": "tools",
+        "children":
+        [{
+            "caption": "SublimeREPL",
+            "mnemonic": "R",
+            "id": "SublimeREPL",
+            "children":
+            [
+                {"command": "repl_open", 
+                 "id": "repl_janet",
+                 "caption": "Janet",
+                 "mnemonic": "J",
+                 "args": {
+                    "type": "subprocess",
+                    "encoding": "utf8",
+                    "cmd": {"linux": ["janet", "-s", "-n"],
+                            "osx": ["janet", "-s", "-n"],
+                            "windows": ["janet.exe", "-s", "-n"]},
+                    "cwd": "$file_path",
+                    "cmd_postfix": "\n",
+                    "syntax": "Janet.sublime-syntax",
+                    "soft_quit": "\n(quit)\n",
+                    "external_id": "janet"
+                    }
+                }
+            ]   
+        }]
+    }
+]
