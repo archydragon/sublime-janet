@@ -65,3 +65,7 @@ SublimeREPL upstream seems to be not really maintained for some years, but still
 ```
 
 `Ctrl+,` shortcuts still don't work, and I ain't sure if I did something wrong or just the age of SublimeREPL projects reveals itself.
+
+## License
+
+[MIT](/LICENSE)
