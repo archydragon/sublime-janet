@@ -1,0 +1,9 @@
+=> 0.4.0
+
+# Changelist
+
+- Package informational messages added, and you're reading one of those now
+- Functions from Janet 1.28 added
+- JPM is now used as a build system if project.janet file is present in the root
+  directory
+- Command palette entries for basic JPM invocations

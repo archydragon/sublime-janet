@@ -1,0 +1,5 @@
+Thank you for using Janet language support package!
+
+If you encounter any issues or have ideas how to improve the package to help
+with your work, don't hesitate to open an issue at Githup page
+https://github.com/archydragon/sublime-janet
