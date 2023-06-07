@@ -1,0 +1,21 @@
+[
+    {
+        "caption": "Janet: Evaluate file",
+        "command": "janet_exec",
+        "args": {
+            "cmd": ["janet", "-n", "$file"]
+        }
+    },
+    {
+        "caption": "JPM: Build",
+        "command": "jpm_build"
+    },
+    {
+        "caption": "JPM: Clean",
+        "command": "jpm_clean"
+    },
+    {
+        "caption": "JPM: Run tests",
+        "command": "jpm_test"
+    }
+]
