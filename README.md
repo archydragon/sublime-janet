@@ -7,7 +7,7 @@ This package provides [Janet](https://janet-lang.org/) languge support and inclu
 - running Janet code right from the editor
 - SublimeREPL integration
 
-Tested against Janet v1.26.
+Supported Janet version: 1.28
 
 ## Screenshots
 
