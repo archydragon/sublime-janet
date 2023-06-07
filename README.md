@@ -40,6 +40,16 @@ There is a known bug that it isn't very consistent when it comes to highlighting
 
 For this and REPL, you need to have Janet binary under one of directories listed in `PATH` environment variable.
 
+#### jpm
+
+[jpm](https://github.com/janet-lang/jpm) is used as default build system, if `project.janet` file is present in the root directory.
+
+**Windows build note**: you need to set `vcvars_bat_path` variable in your Sublime Text settings to match MSVC batch file used for initialization of build environment (e.g. `"C:\\Program Files\\Microsoft Visual Studio\\2022\\Professional\\VC\\Auxiliary\\Build\\vcvars64.bat"`). See [MS documentation about command line toolset](https://learn.microsoft.com/en-us/cpp/build/building-on-the-command-line) for extra details.
+
+There are also shortcuts for `jpm clean` and `jpm test` available in command palette.
+
+#### Single script evaluation
+
 Strictly talking, it isn't a build system, just an evaluation of current file using available Janet interpreter. Partial evaluation of expressions isn't supported yet.
 
 ### Integration with [SublimeREPL](https://packagecontrol.io/packages/SublimeREPL)
