@@ -1,0 +1,6 @@
+{
+    "target": "jpm_build",
+    "keyfiles": ["project.janet"],
+    "working_dir": "${project_path:${folder}}",
+    "cmd": ["jpm"]
+}
